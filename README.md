@@ -1,7 +1,7 @@
 # ProteoClock: Proteomic Aging Clock Analysis
 
 ![ProteoClock Banner](https://img.shields.io/badge/ProteoClock-Proteomic%20Aging%20Analysis-blue)
-![Python](https://img.shields.io/badge/Python-3.9%2B-brightgreen)
+![Python](https://img.shields.io/badge/Python-3.11%2B-brightgreen)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 
 ProteoClock is a Python package for analyzing and predicting biological age using proteomic data. This package implements various published proteomic aging clocks, allowing researchers to predict biological age from protein expression measurements.
