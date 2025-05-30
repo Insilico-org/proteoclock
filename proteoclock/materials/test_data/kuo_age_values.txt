@@ -1,0 +1,6 @@
+patient_id	age
+subject_1	53
+subject_2	65
+subject_3	62
+subject_4	44
+subject_5	54

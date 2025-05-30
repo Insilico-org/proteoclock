@@ -1,0 +1,5 @@
+patient_id	age
+sample_1	53
+sample_2	81
+sample_3	76
+sample_4	73
