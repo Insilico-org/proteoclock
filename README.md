@@ -73,12 +73,12 @@ factory = ClockFactory()
 factory.view_clocks()
 
 # Get a specific clock
-kuo_clock = factory.get_clock("kuo_2024", scaler="ukb_scaler")
-goem_liver = factory.get_clock("goeminne_2025_full_chrono", subtype="liver", 
+goem_liver = factory.get_clock("goeminne_2025_full_chrono",
+                              subtype="liver", 
                               scaler="goeminne_2025_full")
 
 # Predict biological age
-predictions = kuo_clock.predict_age(protein_data, scaling='standard')
+predictions = goem_liver.predict_age(protein_data, scaling='standard')
 ```
 
 ## 📊 Data Format
