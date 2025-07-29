@@ -20,8 +20,10 @@ The package currently implements the following published proteomic aging clocks:
 1. Goeminne's 2025 **OrganAge**: ["Plasma protein-based organ-specific aging and mortality models unveil diseases as accelerated aging of organismal systems"](https://doi.org/10.1016/j.cmet.2024.10.005)
 2. Kuo's 2024 PAC: ["Proteomic aging clock (PAC) predicts age-related outcomes in middle-aged and older adults"](https://doi.org/10.1101/2023.12.19.23300228)
 3. Galkin's 2025 ipfP3GPT: ["AI-Driven Toolset for IPF and Aging Research Associates Lung Fibrosis with Accelerated Aging"](https://doi.org/10.1101/2025.01.09.632065 )
-4. Argintieri's 2024 **ProtAge**: ["Proteomic aging clock predicts mortality and risk of common age-related diseases in diverse populations"](https://doi.org/10.1038/s41591-024-03164-7)
-5. JDJ Han's 2025 proteomic clock: *paper in review*
+
+The following proteomic clocks are comparable to the three above but require direct request sent to the authors:
+1. Argintieri's 2024 **ProtAge**: ["Proteomic aging clock predicts mortality and risk of common age-related diseases in diverse populations"](https://doi.org/10.1038/s41591-024-03164-7)
+2. JDJ Han's 2025 proteomic clock: *paper in review*
 
 ## 🚀 Installation
 
@@ -55,6 +57,7 @@ python -m ipykernel install --user --name proteoclock --display-name "proteocloc
 pip install -e .
 ```
 
+This library stores model weights across dozens of folders, so depending on your connection speed, loading it may take several minutes.
 
 ## 🔍 Quick Start
 
@@ -81,9 +84,17 @@ goem_liver = factory.get_clock("goeminne_2025_full_chrono",
 predictions = goem_liver.predict_age(protein_data, scaling='standard')
 ```
 
+Once the models are loaded, the predictions are obtained in a matter of seconds for datasets containing <100 samples. 
+
+Alternatively, try running the [demo notebook](https://github.com/Insilico-org/proteoclock/blob/main/notebooks/Demo%20Proteoclock.ipynb). If you get the same prediction as in the original demo everything works fine. Now, try replacing the default file paths to your own files and rerun the notebook to get the predictions for your own project. If any errors arise, check the following common issues:
+- Is the data format correct? (see next section)
+- Is the environment installed correctly? (specified library versions, Python 3.11)
+- Are you trying to use the library w/out installing it via pip, e.g. for developing purposes? (you might need to update imports to relative statements)
+- For deep clocks: Is the selected CUDA device available?
+
 ## 📊 Data Format
 
-ProteoClock expects protein data in long format with the following columns:
+ProteoClock expects protein data in long, tab-separated format with the following columns:
 - `patient_id`: Identifier for each sample/patient
 - `gene_symbol`: Protein/gene name
 - `NPX`: Normalized Protein eXpression value
@@ -97,6 +108,9 @@ Example:
 | SAMPLE_002 | IL6         | 6.12  |
 | SAMPLE_002 | TNF         | 5.34  |
 
+See the [`test_data` folder](https://github.com/Insilico-org/proteoclock/tree/main/proteoclock/materials/test_data) for sample data.
+Note that actual age values need to be provided in a separate file with matching `patiend_id` to carry statistical analytics downstream of age prediction.
+
 ## 📚 Core Components
 
 ### Clock Implementations
@@ -109,7 +123,7 @@ All aging clock implementations inherit from the `BaseAgingClock` abstract base 
 1. **LinearClock**: Simple regression-based clocks that directly predict age from protein measurements
 2. **GompertzClock**: Based on mortality risk models like Kuo's 2024 PAC, using Gompertz distribution
 3. **CPHClock**: Cox Proportional Hazards-based clocks that convert mortality risk to biological age
-4. **DeepClock**: Neural network-based clocks for complex non-linear aging patterns
+4. **DeepClock**: Neural network-based clocks for complex non-linear aging patterns (requires GPU)
 
 #### Usage Example
 
@@ -166,3 +180,12 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 💾 System Requirements
+Proteoclock was tested on Ubuntu 24 with Nvidia A10G
+
+For package dependancies see [environment.yml](https://github.com/Insilico-org/proteoclock/blob/main/environment.yml).
+For full support, you need to have a CUDA-enabled GPU, although GPU is not necessary to operate non-deep clocks.
+
+The included deep clock's [weights ](https://github.com/Insilico-org/proteoclock/tree/main/proteoclock/materials/deep_clocks/galkin_2025) weights are only 20MB and shgould fit on most modern PCs with GPU cards.
+
