@@ -10,8 +10,13 @@ import os
 from pathlib import Path
 from typing import Dict, List, Optional, Union, Literal, Any
 import pandas as pd
-import pkg_resources
 from collections import defaultdict
+
+try:
+    import pkg_resources
+    HAS_PKG_RESOURCES = True
+except ImportError:
+    HAS_PKG_RESOURCES = False
 
 from .clocks.simple_clocks.clocks import (
     BaseAgingClock, GompertzClock, LinearClock, CPHClock
@@ -34,12 +39,13 @@ class ClockFactory:
     def _find_materials_path(self) -> Path:
         """Find the materials directory using multiple strategies."""
         # Strategy 1: Try pkg_resources (works for installed packages)
-        try:
-            resource_path = pkg_resources.resource_filename('proteoclock', 'materials')
-            if os.path.exists(resource_path):
-                return Path(resource_path)
-        except:
-            pass
+        if HAS_PKG_RESOURCES:
+            try:
+                resource_path = pkg_resources.resource_filename('proteoclock', 'materials')
+                if os.path.exists(resource_path):
+                    return Path(resource_path)
+            except:
+                pass
         
         # Strategy 2: Relative to this file (works in development)
         current_file = Path(__file__).resolve()
