@@ -53,3 +53,8 @@ Icon
 
 # Log files
 *.log
+
+# Restricted model weights (UK Biobank data return — not for public distribution)
+# Keep local copies for approved use, but never sync them to the repository.
+*.pt
+proteoclock/materials/deep_clocks/galkin_2025/best_clock.pt

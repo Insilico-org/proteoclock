@@ -51,6 +51,17 @@ class AgingClockPredictor:
             feats: Either a dictionary mapping features to genes or a path to a directory
                   containing feature_order.txt
         """
+        if not Path(model_path).exists():
+            raise FileNotFoundError(
+                f"Model weights not found: {model_path}\n"
+                "If this is a UK Biobank (UKB) clock, its weights are no longer "
+                "distributed publicly. Following the UKB data security incident "
+                "(https://www.ukbiobank.ac.uk/news/a-message-to-our-participants-uk-biobank-data-security-update/), "
+                "UKB requested their removal as potentially disclosive "
+                "individual-level data. Register with UKB and access the model "
+                "via the Research Analysis Platform (RAP): https://www.ukbiobank.ac.uk/"
+            )
+
         try:
             # First try with weights_only=False (less secure but handles numpy objects)
             model_dict = torch.load(model_path, map_location=self.device, weights_only=False)

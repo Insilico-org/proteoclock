@@ -22,6 +22,33 @@ from .clocks.simple_clocks.clocks import (
     BaseAgingClock, GompertzClock, LinearClock, CPHClock
 )
 
+# Clocks whose weights were trained on UK Biobank (UKB) data and are no longer
+# distributed with this package. Following the UK Biobank data security incident
+# (see https://www.ukbiobank.ac.uk/news/a-message-to-our-participants-uk-biobank-data-security-update/),
+# UKB reviewed publications using its data and requested that these model
+# weights be removed from the public repository, as trained weights are
+# considered potentially disclosive individual-level data. They are available to
+# registered researchers through the UKB Research Analysis Platform (RAP).
+RESTRICTED_UKB_CLOCKS = {"galkin_2025"}
+
+UKB_WEIGHTS_RESTRICTED_MSG = (
+    "Model weights for '{clock}' are no longer distributed with proteoclock.\n"
+    "\n"
+    "Following the UK Biobank (UKB) data security incident\n"
+    "(https://www.ukbiobank.ac.uk/news/a-message-to-our-participants-uk-biobank-data-security-update/),\n"
+    "UKB reviewed publications using its data and requested that the weights for\n"
+    "this clock be removed from the public repository, because UKB considers\n"
+    "trained model weights to be potentially disclosive individual-level data.\n"
+    "\n"
+    "The weights can no longer be freely accessed, and may not be downloaded,\n"
+    "copied, or stored locally. The model can only be run by registered UK\n"
+    "Biobank researchers within the UKB Research Analysis Platform (RAP), where\n"
+    "the analysis stays inside UKB's secure environment.\n"
+    "\n"
+    "Register with UK Biobank to request access: https://www.ukbiobank.ac.uk/"
+)
+
+
 class ClockFactory:
     """Factory for creating aging clock instances with automatic resource discovery."""
     
@@ -97,11 +124,13 @@ class ClockFactory:
             for clock_dir in self.deep_clocks_path.iterdir():
                 if clock_dir.is_dir():
                     clock_name = clock_dir.name
-                    # Check for required deep clock files
-                    if (clock_dir / "best_clock.pt").exists() and (clock_dir / "feature_order.txt").exists():
+                    # Identify deep clocks by feature_order.txt; weights may be
+                    # absent if restricted (e.g. UKB).
+                    if (clock_dir / "feature_order.txt").exists():
                         clocks[clock_name] = {
                             'type': 'deep',
                             'path': clock_dir,
+                            'weights_available': (clock_dir / "best_clock.pt").exists(),
                             'variants': {'default': str(clock_dir)}
                         }
         
@@ -241,6 +270,11 @@ class ClockFactory:
         elif clock_info['type'] == 'deep':
             print("\nDeep learning clock - single variant available")
             print("  Files: best_clock.pt, feature_order.txt")
+            if not clock_info.get('weights_available', True):
+                print("\n  [RESTRICTED] Weights for this clock are not bundled.")
+                print("  They were removed at UK Biobank's request after the")
+                print("  UKB data security incident. Access requires UKB")
+                print("  registration via the Research Analysis Platform (RAP).")
     
     def view_clock_scalers(self, clock_name: str = None) -> None:
         """Display available scalers, optionally filtered by clock compatibility."""
@@ -299,9 +333,13 @@ class ClockFactory:
         
         # Handle deep clocks
         if clock_info['type'] == 'deep':
-            if name == 'galkin_2025':
+            weights_path = clock_info['path'] / "best_clock.pt"
+            if not clock_info.get('weights_available', weights_path.exists()):
+                raise FileNotFoundError(
+                    UKB_WEIGHTS_RESTRICTED_MSG.format(clock=base_name)
+                )
+            if base_name == 'galkin_2025':
                 from .clocks.deep_clocks.nn_wrapper import AgingClockPredictor
-                weights_path = clock_info['path'] / "best_clock.pt"
                 features_path = clock_info['path'] / "feature_order.txt"
                 return AgingClockPredictor(str(weights_path), str(features_path))
             else:

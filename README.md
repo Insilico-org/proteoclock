@@ -6,6 +6,19 @@
 
 ProteoClock is a Python package for analyzing and predicting biological age using proteomic data. This package implements various published proteomic aging clocks, allowing researchers to predict biological age from protein expression measurements.
 
+## ⚠️ Galkin 2025 clock: weights restricted by UK Biobank
+
+Following the [UK Biobank data security incident](https://www.ukbiobank.ac.uk/news/a-message-to-our-participants-uk-biobank-data-security-update/), UK Biobank (UKB) reviewed publications using its data and requested that the trained weights for the **Galkin 2025 (`galkin_2025`)** deep clock be removed from this repository. UKB considers trained model weights to be potentially disclosive individual-level data that could be used to reverse-engineer participant-level information.
+
+As a result:
+
+- **The `best_clock.pt` weights file is no longer distributed with proteoclock.** It has been removed from the repository and is excluded from version control.
+- **The weights may not be downloaded, copied, or stored locally.** As individual-level UK Biobank data, they cannot be held outside UKB's controlled environment. The weights have been returned to UK Biobank as a data return.
+- The model can only be accessed and run by **registered UK Biobank researchers within the [UKB Research Analysis Platform (RAP)](https://www.ukbiobank.ac.uk/)**, where the analysis stays inside UKB's secure environment.
+- All other clocks in this package are **unaffected** and continue to work normally.
+
+Calling `factory.get_clock("galkin_2025")` outside an environment where the weights are authorized raises an error pointing to these instructions.
+
 ## 🧬 Features
 
 - **Multiple Clock Implementations**: Linear, Gompertz, and Cox Proportional Hazards (CPH) based aging clocks
@@ -19,7 +32,7 @@ The package currently implements the following published proteomic aging clocks:
 
 1. Goeminne's 2025 **OrganAge**: ["Plasma protein-based organ-specific aging and mortality models unveil diseases as accelerated aging of organismal systems"](https://doi.org/10.1016/j.cmet.2024.10.005)
 2. Kuo's 2024 PAC: ["Proteomic aging clock (PAC) predicts age-related outcomes in middle-aged and older adults"](https://doi.org/10.1101/2023.12.19.23300228)
-3. Galkin's 2025 ipfP3GPT: ["AI-Driven Toolset for IPF and Aging Research Associates Lung Fibrosis with Accelerated Aging"](https://doi.org/10.1101/2025.01.09.632065 )
+3. Galkin's 2025 ipfP3GPT: ["AI-Driven Toolset for IPF and Aging Research Associates Lung Fibrosis with Accelerated Aging"](https://doi.org/10.1101/2025.01.09.632065 ) — ⚠️ **weights restricted, see [below](#-galkin-2025-clock-weights-restricted-by-uk-biobank)**
 
 The following proteomic clocks are comparable to the three above but require direct request sent to the authors:
 1. Argintieri's 2024 **ProtAge**: ["Proteomic aging clock predicts mortality and risk of common age-related diseases in diverse populations"](https://doi.org/10.1038/s41591-024-03164-7)
@@ -187,5 +200,5 @@ Proteoclock was tested on Ubuntu 24 with Nvidia A10G
 For package dependancies see [environment.yml](https://github.com/Insilico-org/proteoclock/blob/main/environment.yml).
 For full support, you need to have a CUDA-enabled GPU, although GPU is not necessary to operate non-deep clocks.
 
-The included deep clock's [weights ](https://github.com/Insilico-org/proteoclock/tree/main/proteoclock/materials/deep_clocks/galkin_2025) weights are only 20MB and shgould fit on most modern PCs with GPU cards.
+The Galkin 2025 deep clock's weights are **not included** in this package. They are restricted UK Biobank data and can only be used by registered researchers within the UKB Research Analysis Platform (RAP) — see [the notice above](#-galkin-2025-clock-weights-restricted-by-uk-biobank). All other clocks run without a GPU.
 
